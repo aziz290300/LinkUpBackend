@@ -38,8 +38,10 @@ public class Academie {
     public List<ImageData> logoacademie;
     @ManyToOne
     private User utilisateur;
-    @OneToMany
+    @OneToMany(mappedBy = "academie")
     private List<Joueur> joueurs;
+    @ManyToMany (mappedBy = "academiesList")
+    private List<Tournoi> tournois;
 
 
 

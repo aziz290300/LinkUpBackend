@@ -37,7 +37,7 @@ public class Tournoi {
     public List<ImageData> logotournoi;
     @ManyToMany
     private List<Academie> academiesList;
-    @OneToMany
+    @OneToMany (mappedBy = "tournoi")
     private List<Match> matches;
 
 

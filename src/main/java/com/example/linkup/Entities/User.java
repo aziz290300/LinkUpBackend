@@ -19,7 +19,7 @@ public class User {
     private String nom;
     private String email;
     private String password;
-    @OneToMany
+    @OneToMany ( mappedBy="utilisateur")
     private List<Academie> academies;
 
 
