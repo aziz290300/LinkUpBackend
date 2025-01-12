@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -12,8 +13,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
-public class Joueur {
+public class Joueur implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,9 +21,21 @@ public class Joueur {
     private String prenom;
     private LocalDate datenaissance;
     private String telephone;
-    @Enumerated(EnumType.STRING)
-    private categorie categorie;
+    private String categorie;
 
+    @ManyToMany(
+            fetch = FetchType.EAGER,
+            cascade = {CascadeType.ALL}
+    )
+    @JoinTable(name = "dossierImageJoueur",
+            joinColumns = {
+                    @JoinColumn(name = "dossierImageJoueurId")
+            },
+            inverseJoinColumns = {
+                    @JoinColumn(name = "imageId")
+            }
+    )
+    public List<ImageData> photoJoueur;
     @ManyToOne
     private Academie academie;
 

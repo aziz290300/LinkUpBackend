@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Entity
@@ -11,8 +12,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
-public class Tournoi {
+public class Tournoi implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id ;
@@ -25,14 +25,6 @@ public class Tournoi {
     @ManyToMany(
             fetch = FetchType.EAGER,
             cascade = {CascadeType.ALL}
-    )
-    @JoinTable(name = "dossierImage",
-            joinColumns = {
-                    @JoinColumn(name = "dossierId")
-            },
-            inverseJoinColumns = {
-                    @JoinColumn(name = "imageId")
-            }
     )
     public List<ImageData> logotournoi;
     @ManyToMany
