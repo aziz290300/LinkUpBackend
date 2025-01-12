@@ -3,6 +3,8 @@ package com.example.linkup.Entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
+
 @Entity
 @Getter
 @Setter
@@ -10,7 +12,7 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 @ToString
-public class ImageData {
+public class ImageData implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
