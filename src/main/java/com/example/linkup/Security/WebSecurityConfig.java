@@ -58,16 +58,25 @@ public class WebSecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
-                .authorizeHttpRequests((authz) -> authz
-                        .requestMatchers("/auth/**").permitAll()  // Permet d'accéder à /auth/**
-                        .requestMatchers("/contents/**").hasAnyRole("ORGANISATEUR", "RESPONSABLE")
-                        .requestMatchers("/admin/**").hasRole("SUPERVISEUR")
-                        .anyRequest().authenticated()
+                .authorizeHttpRequests(authz -> authz
+                        // Routes publiques
+                        .requestMatchers("/auth/**").permitAll()
+
+                        // Routes pour SUPERVISEUR
+                        .requestMatchers("academie/**").hasRole("SUPERVISEUR")
+
+                        // Routes pour RESPONSABLE et ORGANISATEUR
+                        .requestMatchers("joueur/**").hasAnyRole("RESPONSABLE", "ORGANISATEUR")
+
+                        // Bloquer toutes les autres requêtes
+                        .anyRequest().denyAll()
                 )
                 .addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
+
+
 
 
 
