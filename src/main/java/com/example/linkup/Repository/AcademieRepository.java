@@ -9,4 +9,5 @@ import java.util.Optional;
 @Repository
 public interface AcademieRepository extends JpaRepository<Academie, Long> {
     Optional<Academie> findById(Long id);
+    Academie findByUtilisateurId(Long id);
 }

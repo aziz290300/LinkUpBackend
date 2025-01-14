@@ -61,11 +61,12 @@ public class JoueurController {
     }
     @PostMapping(value = {"/addNewJoueur"},produces = {"text/plain","application/json"}, consumes= {"multipart/mixed", MediaType.APPLICATION_JSON_VALUE,MediaType.MULTIPART_FORM_DATA_VALUE,MediaType.APPLICATION_OCTET_STREAM_VALUE})
     public ResponseEntity<String> addNewJoueur(@RequestPart("joueur") @Valid Joueur joueur,
-                                                 @RequestPart("file") MultipartFile[] file){
+                                                 @RequestPart("file") MultipartFile[] file,
+                                               @RequestParam("idAcademyOwner") Long idAcademyOwner){
         try{
             List<ImageData> images = uploadImage(file);
             joueur.setPhotoJoueur(images);
-            joueurService.addJoueur(joueur);
+            joueurService.addJoueurAndAffectToAcademy(joueur,idAcademyOwner);
             return ResponseEntity.ok("File and JSON data received");
         } catch (Exception e ){
             System.out.println(e.getMessage());
