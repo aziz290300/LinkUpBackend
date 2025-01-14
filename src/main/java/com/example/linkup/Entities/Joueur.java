@@ -1,5 +1,6 @@
 package com.example.linkup.Entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -17,6 +18,7 @@ public class Joueur implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private int buts;
     private String nom;
     private String prenom;
     private LocalDate datenaissance;
@@ -37,6 +39,7 @@ public class Joueur implements Serializable {
     )
     public List<ImageData> photoJoueur;
     @ManyToOne
+    @JsonIgnore
     private Academie academie;
 
 

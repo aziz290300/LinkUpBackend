@@ -1,8 +1,8 @@
 package com.example.linkup.Entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-import lombok.experimental.FieldDefaults;
 
 import java.io.Serializable;
 import java.util.List;
@@ -42,6 +42,9 @@ public class Academie implements Serializable {
     private List<Joueur> joueurs;
     @ManyToMany (mappedBy = "academiesList")
     private List<Tournoi> tournois;
+    @ManyToMany
+
+    private List<match> matches;
 
 
 

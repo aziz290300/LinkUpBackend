@@ -2,6 +2,7 @@ package com.example.linkup.Controller;
 
 import com.example.linkup.Entities.Academie;
 import com.example.linkup.Entities.ImageData;
+import com.example.linkup.Entities.Joueur;
 import com.example.linkup.Repository.StorageRepository;
 import com.example.linkup.Services.Impl.AcademieServiceImpl;
 import jakarta.validation.Valid;
@@ -88,5 +89,9 @@ public class AcademieController {
 
 
         return imageDatas;
+    }
+    @GetMapping("/{idAcademie}/joueurs")
+    public List<Joueur> getJoueursByAcademie(@PathVariable Long idAcademie) {
+        return academieService.getJoueursByAcademie(idAcademie);
     }
 }

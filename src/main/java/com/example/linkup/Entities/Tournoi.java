@@ -29,8 +29,6 @@ public class Tournoi implements Serializable {
     public List<ImageData> logotournoi;
     @ManyToMany
     private List<Academie> academiesList;
-    @OneToMany (mappedBy = "tournoi")
-    private List<Match> matches;
 
 
 }
