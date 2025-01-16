@@ -6,14 +6,19 @@ import com.example.linkup.Entities.match;
 import com.example.linkup.Repository.AcademieRepository;
 import com.example.linkup.Repository.JoueurRepository;
 import com.example.linkup.Repository.MatchRepository;
+import com.example.linkup.Services.MatchService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class MtachServiceImpl  {
+    private static final Logger logger = LoggerFactory.getLogger(MatchService.class);
+
     @Autowired
      MatchRepository matchRepository;
     @Autowired
@@ -60,27 +65,31 @@ public class MtachServiceImpl  {
         return matchRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Match introuvable."));
     }
+    @Transactional
     public match updateMatchScore(Long matchId, Long academieId, Long joueurId) {
         // Trouver le match
+        logger.info("Mise à jour du score pour le match ID: {}, académie ID: {}, joueur ID: {}", matchId, academieId, joueurId);
+
         match match = matchRepository.findById(matchId)
-                .orElseThrow(() -> new IllegalArgumentException("Match introuvable."));
+                .orElseThrow(() -> {
+                    logger.error("Le match avec l'ID {} est introuvable.", matchId);
+                    return new IllegalArgumentException("Le match avec l'ID " + matchId + " est introuvable.");
+                });
 
-        // Trouver l'académie
+        logger.info("Match trouvé : {}", match);
+
+        // Trouver l'académie et vérifier l'association
         Academie academie = academieRepository.findById(academieId)
-                .orElseThrow(() -> new IllegalArgumentException("Académie introuvable."));
-
-        // Vérifier si l'académie est associée au match
+                .orElseThrow(() -> new IllegalArgumentException("L'académie avec l'ID " + academieId + " est introuvable."));
         if (!match.getAcademies().contains(academie)) {
-            throw new IllegalArgumentException("L'académie n'est pas associée à ce match.");
+            throw new IllegalArgumentException("L'académie avec l'ID " + academieId + " n'est pas associée au match.");
         }
 
-        // Trouver le joueur
+        // Trouver le joueur et vérifier l'association avec l'académie
         Joueur joueur = joueurRepository.findById(joueurId)
-                .orElseThrow(() -> new IllegalArgumentException("Joueur introuvable."));
-
-        // Vérifier si le joueur appartient à l'académie
+                .orElseThrow(() -> new IllegalArgumentException("Le joueur avec l'ID " + joueurId + " est introuvable."));
         if (!joueur.getAcademie().equals(academie)) {
-            throw new IllegalArgumentException("Le joueur n'appartient pas à cette académie.");
+            throw new IllegalArgumentException("Le joueur avec l'ID " + joueurId + " n'appartient pas à l'académie " + academieId + ".");
         }
 
         // Ajouter un but au joueur
@@ -88,23 +97,34 @@ public class MtachServiceImpl  {
         joueurRepository.save(joueur);
 
         // Mettre à jour le score du match
-        String[] scoreParts = match.getScore() == null || match.getScore().isEmpty()
-                ? new String[]{"0", "0"} // Initialiser le score si absent
-                : match.getScore().split(" - ");
+        String[] scoreParts = parseScore(match.getScore());
 
-        int scoreAcademie1 = Integer.parseInt(scoreParts[0].trim());
-        int scoreAcademie2 = Integer.parseInt(scoreParts[1].trim());
+        // Déterminer l'académie et mettre à jour les scores
+        int scoreAcademie1 = Integer.parseInt(scoreParts[0]);
+        int scoreAcademie2 = Integer.parseInt(scoreParts[1]);
 
-        if (match.getAcademies().get(0).equals(academie)) {
-            scoreAcademie1++; // Incrémenter le score pour la première académie
+        int academieIndex = match.getAcademies().indexOf(academie);
+        if (academieIndex == 0) {
+            scoreAcademie1++;
+        } else if (academieIndex == 1) {
+            scoreAcademie2++;
         } else {
-            scoreAcademie2++; // Incrémenter le score pour la seconde académie
+            throw new IllegalArgumentException("L'académie n'est pas reconnue dans ce match.");
         }
 
-        // Mettre à jour et sauvegarder le score
-        match.setScore(scoreAcademie1 + " - " + scoreAcademie2);
+        // Sauvegarder le nouveau score
+        match.setScore(scoreAcademie1 + "-" + scoreAcademie2);
         return matchRepository.save(match);
     }
+
+    private String[] parseScore(String score) {
+        if (score == null || !score.contains("-")) {
+            throw new IllegalArgumentException("Format de score invalide : " + score);
+        }
+        return score.split("-");
+    }
+
+
 
     public Academie getAcademyById(match match, Long academieId) {
         return match.getAcademies().stream()
