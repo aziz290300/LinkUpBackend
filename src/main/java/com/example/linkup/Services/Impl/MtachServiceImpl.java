@@ -67,7 +67,6 @@ public class MtachServiceImpl  {
     }
     @Transactional
     public match updateMatchScore(Long matchId, Long academieId, Long joueurId) {
-        // Trouver le match
         logger.info("Mise à jour du score pour le match ID: {}, académie ID: {}, joueur ID: {}", matchId, academieId, joueurId);
 
         match match = matchRepository.findById(matchId)
@@ -78,28 +77,23 @@ public class MtachServiceImpl  {
 
         logger.info("Match trouvé : {}", match);
 
-        // Trouver l'académie et vérifier l'association
         Academie academie = academieRepository.findById(academieId)
                 .orElseThrow(() -> new IllegalArgumentException("L'académie avec l'ID " + academieId + " est introuvable."));
         if (!match.getAcademies().contains(academie)) {
             throw new IllegalArgumentException("L'académie avec l'ID " + academieId + " n'est pas associée au match.");
         }
 
-        // Trouver le joueur et vérifier l'association avec l'académie
         Joueur joueur = joueurRepository.findById(joueurId)
                 .orElseThrow(() -> new IllegalArgumentException("Le joueur avec l'ID " + joueurId + " est introuvable."));
         if (!joueur.getAcademie().equals(academie)) {
             throw new IllegalArgumentException("Le joueur avec l'ID " + joueurId + " n'appartient pas à l'académie " + academieId + ".");
         }
 
-        // Ajouter un but au joueur
         joueur.setButs(joueur.getButs() + 1);
         joueurRepository.save(joueur);
 
-        // Mettre à jour le score du match
         String[] scoreParts = parseScore(match.getScore());
 
-        // Déterminer l'académie et mettre à jour les scores
         int scoreAcademie1 = Integer.parseInt(scoreParts[0]);
         int scoreAcademie2 = Integer.parseInt(scoreParts[1]);
 
@@ -112,16 +106,21 @@ public class MtachServiceImpl  {
             throw new IllegalArgumentException("L'académie n'est pas reconnue dans ce match.");
         }
 
-        // Sauvegarder le nouveau score
         match.setScore(scoreAcademie1 + "-" + scoreAcademie2);
         return matchRepository.save(match);
     }
 
+
     private String[] parseScore(String score) {
-        if (score == null || !score.contains("-")) {
+        if (score == null || score.isEmpty()) {
+            throw new IllegalArgumentException("Le score ne peut pas être nul ou vide.");
+        }
+        // Supprimer les espaces autour du tiret
+        String normalizedScore = score.replace(" - ", "-").replace(" ", "");
+        if (!normalizedScore.matches("\\d+-\\d+")) {
             throw new IllegalArgumentException("Format de score invalide : " + score);
         }
-        return score.split("-");
+        return normalizedScore.split("-");
     }
 
 
