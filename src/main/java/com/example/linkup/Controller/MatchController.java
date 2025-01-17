@@ -76,5 +76,26 @@ public class MatchController {
         return matchService.getAcademyById(match, academieId);
     }
 
+    @PutMapping("/addCarton/{matchId}")
+    public ResponseEntity<match> addCarton(
+            @PathVariable Long matchId,
+            @RequestParam Long academieId,
+            @RequestParam Long joueurId,
+            @RequestParam String couleurCarton) {
+        try {
+            logger.info("Ajout d'un carton {} pour matchId : {}, academieId : {}, joueurId : {}",
+                    couleurCarton, matchId, academieId, joueurId);
+
+            match updatedMatch = matchService.addCarton(matchId, academieId, joueurId, couleurCarton);
+            logger.info("Carton ajouté avec succès.");
+            return ResponseEntity.ok(updatedMatch);
+        } catch (IllegalArgumentException e) {
+            logger.error("Erreur lors de l'ajout du carton : {}", e.getMessage(), e);
+            return ResponseEntity.badRequest().body(null);
+        } catch (Exception e) {
+            logger.error("Erreur inattendue lors de l'ajout du carton : {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
 
 }

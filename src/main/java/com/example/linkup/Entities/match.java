@@ -23,6 +23,11 @@ public class match implements Serializable {
     private int duree_mitemps;
     private LocalDateTime datetime;
     private String score;
+    private String carton_rouge = ""; // Initialise avec une chaîne vide
+    private String carton_jaune = ""; // Initialise avec une chaîne vide
+
+
+
     @ManyToMany
     @JoinTable(
             name = "match_academie", // nom de la table de jonction

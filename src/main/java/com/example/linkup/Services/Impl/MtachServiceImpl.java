@@ -146,4 +146,50 @@ public class MtachServiceImpl  {
         } else {
             throw new IllegalArgumentException("Match introuvable.");
         }
-    }}
+    }
+    @Transactional
+    public match addCarton(Long matchId, Long academieId, Long joueurId, String couleurCarton) {
+        logger.info("Ajout d'un carton {} pour le joueur ID: {}, académie ID: {}, match ID: {}", couleurCarton, joueurId, academieId, matchId);
+
+        // Vérification du match
+        match match = matchRepository.findById(matchId)
+                .orElseThrow(() -> {
+                    logger.error("Le match avec l'ID {} est introuvable.", matchId);
+                    return new IllegalArgumentException("Le match avec l'ID " + matchId + " est introuvable.");
+                });
+
+        // Initialisation des champs s'ils sont null
+        if (match.getCarton_rouge() == null) {
+            match.setCarton_rouge("");
+        }
+        if (match.getCarton_jaune() == null) {
+            match.setCarton_jaune("");
+        }
+
+        // Vérification de l'académie
+        Academie academie = academieRepository.findById(academieId)
+                .orElseThrow(() -> new IllegalArgumentException("L'académie avec l'ID " + academieId + " est introuvable."));
+        if (!match.getAcademies().contains(academie)) {
+            throw new IllegalArgumentException("L'académie avec l'ID " + academieId + " n'est pas associée au match.");
+        }
+
+        // Vérification du joueur
+        Joueur joueur = joueurRepository.findById(joueurId)
+                .orElseThrow(() -> new IllegalArgumentException("Le joueur avec l'ID " + joueurId + " est introuvable."));
+        if (!joueur.getAcademie().equals(academie)) {
+            throw new IllegalArgumentException("Le joueur avec l'ID " + joueurId + " n'appartient pas à l'académie " + academieId + ".");
+        }
+
+        // Ajout du carton
+        if ("rouge".equalsIgnoreCase(couleurCarton)) {
+            match.setCarton_rouge(match.getCarton_rouge() + (match.getCarton_rouge().isEmpty() ? "" : ",") + joueurId);
+        } else if ("jaune".equalsIgnoreCase(couleurCarton)) {
+            match.setCarton_jaune(match.getCarton_jaune() + (match.getCarton_jaune().isEmpty() ? "" : ",") + joueurId);
+        } else {
+            throw new IllegalArgumentException("Couleur du carton invalide. Utilisez 'rouge' ou 'jaune'.");
+        }
+
+        return matchRepository.save(match);
+    }
+
+}
