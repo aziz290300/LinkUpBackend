@@ -36,10 +36,13 @@ public class Academie implements Serializable {
             }
     )
     public List<ImageData> logoacademie;
+    @JsonIgnore
     @ManyToOne
     private User utilisateur;
+    @JsonIgnore
     @OneToMany(mappedBy = "academie")
     private List<Joueur> joueurs;
+    @JsonIgnore
     @ManyToMany (mappedBy = "academiesList")
     private List<Tournoi> tournois;
     @ManyToMany

@@ -14,4 +14,5 @@ public interface AcademieRepository extends JpaRepository<Academie, Long> {
     List<Academie> findAllByIdIn(List<Long> ids);
 
 
+    Academie findByUtilisateurId(Long id);
 }
