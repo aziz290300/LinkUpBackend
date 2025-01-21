@@ -6,6 +6,7 @@ import com.example.linkup.Entities.Tournoi;
 import com.example.linkup.Repository.AcademieRepository;
 import com.example.linkup.Repository.StorageRepository;
 import com.example.linkup.Repository.TournoiRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +39,18 @@ public class TournoiServiceImpl {
     public void deleteTournoi(Tournoi tournoi){tournoiRepository.delete(tournoi);}
 
     public ImageData modifieImage(ImageData o){ return storageRepository.save(o); }
-    public void deleteTournoiByID(long cl){tournoiRepository.deleteById(cl);}
+    public void deleteTournoiByID(long cl) {
+
+        Tournoi tournoi = tournoiRepository.findById(cl)
+                .orElseThrow(() -> new EntityNotFoundException("Tournoi not found with ID: " + cl));
+        if (tournoi.getAcademiesList() != null) {
+            tournoi.getAcademiesList().forEach(academie -> academie.getTournois().remove(tournoi));
+        }
+
+        tournoi.getAcademiesList().forEach(academie -> academieRepository.save(academie));
+
+        tournoiRepository.deleteById(cl);
+    }
+
 
 }

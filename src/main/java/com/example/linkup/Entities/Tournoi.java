@@ -1,5 +1,6 @@
 package com.example.linkup.Entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -31,8 +32,10 @@ public class Tournoi implements Serializable {
             cascade = {CascadeType.ALL}
     )
     public List<ImageData> logotournoi;
+    @JsonIgnore
     @ManyToMany
     private List<Academie> academiesList;
+    @JsonIgnore
     @OneToMany (mappedBy = "tournoi")
     private List<Match> matches;
 

@@ -63,10 +63,10 @@ public class WebSecurityConfig {
                         .requestMatchers("/auth/**").permitAll()
 
                         // Routes pour SUPERVISEUR
-                        .requestMatchers("academie/**").hasAnyRole("SUPERVISEUR", "RESPONSABLE")
+                        .requestMatchers("academie/**","tournoi/**").hasAnyRole("SUPERVISEUR", "RESPONSABLE")
 
                         // Routes pour RESPONSABLE et ORGANISATEUR
-                        .requestMatchers("joueur/**","tournoi/**").hasAnyRole("RESPONSABLE", "ORGANISATEUR")
+                        .requestMatchers("joueur/**").hasAnyRole("RESPONSABLE", "ORGANISATEUR")
 
 
                         // Bloquer toutes les autres requêtes

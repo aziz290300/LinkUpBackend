@@ -39,6 +39,9 @@ public class TournoiController {
     @DeleteMapping("/deleteTournoi")
     public void deleteTournoi(@RequestBody Tournoi ct){tournoiService.deleteTournoi(ct);}
 
+    @DeleteMapping("/deleteTournoiByID/{idTournoi}")
+    public void deleteTournoiByID(@PathVariable("idTournoi") long idTournoi){tournoiService.deleteTournoiByID(idTournoi);}
+
     //------------------------------Add with image----------------------------------------------------------
     @PutMapping(value = {"/updateNewTournoi"},produces = {"text/plain","application/json"}, consumes= {"multipart/mixed", MediaType.APPLICATION_JSON_VALUE,MediaType.MULTIPART_FORM_DATA_VALUE,MediaType.APPLICATION_OCTET_STREAM_VALUE})
     public ResponseEntity<String> updateTournoi(@RequestPart("tournoi") @Valid Tournoi tournoi,
