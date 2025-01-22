@@ -31,7 +31,7 @@ public class MtachServiceImpl  {
 
 public List<Joueur> getJoueurAvecCartonJaune(long idMatch){
     match match=matchRepository.findById(idMatch).get();
-    return null;
+    return null;git 
 }
     public match addMatch(match match, List<Long> academieIds) {
         // Vérifier que deux académies sont sélectionnées
