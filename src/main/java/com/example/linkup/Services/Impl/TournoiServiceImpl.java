@@ -1,7 +1,12 @@
 package com.example.linkup.Services.Impl;
 
+import com.example.linkup.Entities.Academie;
+import com.example.linkup.Entities.ImageData;
 import com.example.linkup.Entities.Tournoi;
+import com.example.linkup.Repository.AcademieRepository;
+import com.example.linkup.Repository.StorageRepository;
 import com.example.linkup.Repository.TournoiRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,11 +16,18 @@ import java.util.List;
 public class TournoiServiceImpl {
     @Autowired
     TournoiRepository tournoiRepository;
-
-
+    @Autowired
+    AcademieRepository academieRepository;
+    @Autowired
+    StorageRepository storageRepository;
     //----------------------CRUD--------------------------------------------------------------------------------------
 
     public Tournoi addTournoi(Tournoi tournoi){return tournoiRepository.save(tournoi);}
+    public Tournoi addTournoiAndAffectAcademy(Tournoi tournoi,List<Long> idAcademy){
+        List<Academie> academies = academieRepository.findAllById(idAcademy); // Fetch academies by IDs
+        tournoi.setAcademiesList(academies); // Set the relationship
+        return tournoiRepository.save(tournoi);
+    }
 
     public List<Tournoi> displayTournoi(){ return (List<Tournoi>) tournoiRepository.findAll();}
 
@@ -25,5 +37,20 @@ public class TournoiServiceImpl {
     public Tournoi modifieTournoi(Tournoi tournoi){ return tournoiRepository.save(tournoi); }
 
     public void deleteTournoi(Tournoi tournoi){tournoiRepository.delete(tournoi);}
+
+    public ImageData modifieImage(ImageData o){ return storageRepository.save(o); }
+    public void deleteTournoiByID(long cl) {
+
+        Tournoi tournoi = tournoiRepository.findById(cl)
+                .orElseThrow(() -> new EntityNotFoundException("Tournoi not found with ID: " + cl));
+        if (tournoi.getAcademiesList() != null) {
+            tournoi.getAcademiesList().forEach(academie -> academie.getTournois().remove(tournoi));
+        }
+
+        tournoi.getAcademiesList().forEach(academie -> academieRepository.save(academie));
+
+        tournoiRepository.deleteById(cl);
+    }
+
 
 }
