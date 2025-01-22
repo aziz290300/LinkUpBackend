@@ -3,7 +3,7 @@ package com.example.linkup.Controller;
 import com.example.linkup.Entities.Academie;
 import com.example.linkup.Entities.ImageData;
 import com.example.linkup.Entities.Joueur;
-import com.example.linkup.Repository.StorageRepository;
+import com.example.linkup.Entities.User;
 import com.example.linkup.Services.Impl.AcademieServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,11 +24,12 @@ public class AcademieController {
     AcademieServiceImpl academieService;
 
 
-    @PostMapping("/addAcademie")
-    public Academie addAcademie(@RequestBody Academie ct){return academieService.addAcademie(ct);}
 
     @GetMapping("/displayAcademie")
     public List<Academie> displayAcademie(){ return (List<Academie>) academieService.displayAcademie();}
+
+    @GetMapping("/displayOwnersWithoutAcademie")
+    public List<User> displayOwnersWithoutAcademie(){ return (List<User>) academieService.displayOwnersWithoutAcademie();}
 
     @GetMapping("/displayAcademieByID/{idAcademie}")
     public Academie displayAcademie(@PathVariable("idAcademie") long idAcademie){return academieService.displayAcademie((int)idAcademie);}
@@ -63,12 +64,13 @@ public class AcademieController {
     }
     @PostMapping(value = {"/addNewAcademie"},produces = {"text/plain","application/json"}, consumes= {"multipart/mixed", MediaType.APPLICATION_JSON_VALUE,MediaType.MULTIPART_FORM_DATA_VALUE,MediaType.APPLICATION_OCTET_STREAM_VALUE})
     public ResponseEntity<String> addNewAcademie(@RequestPart("academie") @Valid Academie academie,
-                                               @RequestPart("file") MultipartFile[] file){
+                                               @RequestPart("file") MultipartFile[] file,
+                                                 @RequestParam("idAcademyOwner") Long idAcademyOwner){
         try{
             List<ImageData> images = uploadImage(file);
             academie.setLogoacademie(images);
             academie.setTournois(null);
-            academieService.addAcademie(academie);
+            academieService.addAcademie(academie,idAcademyOwner);
             return ResponseEntity.ok("File and JSON data received");
         } catch (Exception e ){
             System.out.println(e.getMessage());
