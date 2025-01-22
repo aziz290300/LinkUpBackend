@@ -1,13 +1,12 @@
 package com.example.linkup.Controller;
 
 import com.example.linkup.Entities.Academie;
-import com.example.linkup.Entities.match;
+import com.example.linkup.Entities.Match;
 import com.example.linkup.Services.Impl.MtachServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.List;
@@ -23,22 +22,22 @@ public class MatchController {
     MtachServiceImpl matchService;
 
     @PostMapping("/add")
-    public match addMatch(@RequestBody match match, @RequestParam List<Long> academieIds) {
+    public Match addMatch(@RequestBody Match match, @RequestParam List<Long> academieIds) {
         return matchService.addMatch(match, academieIds);
     }
 
     @PutMapping("/update/{id}")
-    public match updateMatch(@PathVariable Integer id, @RequestBody match match) {
+    public Match updateMatch(@PathVariable Integer id, @RequestBody Match match) {
         return matchService.updateMatch(id, match);
     }
 
     @GetMapping("/{id}")
-    public match getMatchById(@PathVariable Integer id) {
+    public Match getMatchById(@PathVariable Integer id) {
         return matchService.getMatchById(id);
     }
 
     @GetMapping("/all")
-    public List<match> getAllMatches() {
+    public List<Match> getAllMatches() {
         return matchService.getAllMatches();
     }
 
@@ -49,7 +48,7 @@ public class MatchController {
 
 
     @PutMapping("/updateScore/{matchId}")
-    public ResponseEntity<match> updateMatchScore(
+    public ResponseEntity<Match> updateMatchScore(
             @PathVariable Long matchId,
             @RequestParam Long academieId,
             @RequestParam Long joueurId) {
@@ -57,7 +56,7 @@ public class MatchController {
             logger.info("Mise à jour du score pour matchId : {}, academieId : {}, joueurId : {}",
                     matchId, academieId, joueurId);
 
-            match updatedMatch = matchService.updateMatchScore(matchId, academieId, joueurId);
+            Match updatedMatch = matchService.updateMatchScore(matchId, academieId, joueurId);
             logger.info("Score mis à jour avec succès : {}", updatedMatch.getScore());
             return ResponseEntity.ok(updatedMatch);
         } catch (IllegalArgumentException e) {
@@ -72,12 +71,12 @@ public class MatchController {
 
     @GetMapping("/{matchId}/academie/{academieId}")
     public Academie getAcademyById(@PathVariable Integer matchId, @PathVariable Long academieId) {
-        match match = matchService.getMatchById(matchId);
+        Match match = matchService.getMatchById(matchId);
         return matchService.getAcademyById(match, academieId);
     }
 
     @PutMapping("/addCarton/{matchId}")
-    public ResponseEntity<match> addCarton(
+    public ResponseEntity<Match> addCarton(
             @PathVariable Long matchId,
             @RequestParam Long academieId,
             @RequestParam Long joueurId,
@@ -86,7 +85,7 @@ public class MatchController {
             logger.info("Ajout d'un carton {} pour matchId : {}, academieId : {}, joueurId : {}",
                     couleurCarton, matchId, academieId, joueurId);
 
-            match updatedMatch = matchService.addCarton(matchId, academieId, joueurId, couleurCarton);
+            Match updatedMatch = matchService.addCarton(matchId, academieId, joueurId, couleurCarton);
             logger.info("Carton ajouté avec succès.");
             return ResponseEntity.ok(updatedMatch);
         } catch (IllegalArgumentException e) {

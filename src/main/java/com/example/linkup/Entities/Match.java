@@ -1,11 +1,9 @@
 package com.example.linkup.Entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -15,7 +13,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class match implements Serializable {
+public class Match implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -37,5 +35,8 @@ public class match implements Serializable {
 
     private List<Academie> academies;
 
-
+    @ElementCollection
+    private List<String> butteur;
+    @ManyToOne
+    private Tournoi tournoi;
 }

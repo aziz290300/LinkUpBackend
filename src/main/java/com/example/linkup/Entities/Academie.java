@@ -48,7 +48,7 @@ public class Academie implements Serializable {
     private List<Tournoi> tournois;
     @ManyToMany
 
-    private List<match> matches;
+    private List<Match> Matches;
 
 
 

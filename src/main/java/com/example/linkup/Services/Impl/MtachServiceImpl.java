@@ -2,12 +2,11 @@ package com.example.linkup.Services.Impl;
 
 import com.example.linkup.Entities.Academie;
 import com.example.linkup.Entities.Joueur;
-import com.example.linkup.Entities.match;
+import com.example.linkup.Entities.Match;
 import com.example.linkup.Repository.AcademieRepository;
 import com.example.linkup.Repository.JoueurRepository;
 import com.example.linkup.Repository.MatchRepository;
 import com.example.linkup.Services.MatchService;
-import com.fasterxml.jackson.databind.deser.DataFormatReaders;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,10 +29,10 @@ public class MtachServiceImpl  {
 
 
 public List<Joueur> getJoueurAvecCartonJaune(long idMatch){
-    match match=matchRepository.findById(idMatch).get();
+    Match match=matchRepository.findById(idMatch).get();
     return null;
 }
-    public match addMatch(match match, List<Long> academieIds) {
+    public Match addMatch(Match match, List<Long> academieIds) {
         // Vérifier que deux académies sont sélectionnées
         if (academieIds == null || academieIds.size() != 2) {
             throw new IllegalArgumentException("Deux académies doivent être sélectionnées.");
@@ -50,10 +49,10 @@ public List<Joueur> getJoueurAvecCartonJaune(long idMatch){
     }
 
 
-    public match updateMatch(Integer matchId, match match) {
-        Optional<com.example.linkup.Entities.match> existingMatch = matchRepository.findById(matchId);
+    public Match updateMatch(Integer matchId, Match match) {
+        Optional<Match> existingMatch = matchRepository.findById(matchId);
         if (existingMatch.isPresent()) {
-            com.example.linkup.Entities.match updatedMatch = existingMatch.get();
+            Match updatedMatch = existingMatch.get();
             updatedMatch.setNbrmitemps(match.getNbrmitemps());
             updatedMatch.setDuree_mitemps(match.getDuree_mitemps());
             updatedMatch.setDatetime(match.getDatetime());
@@ -65,15 +64,15 @@ public List<Joueur> getJoueurAvecCartonJaune(long idMatch){
     }
 
 
-    public match getMatchById(Integer id) {
+    public Match getMatchById(Integer id) {
         return matchRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Match introuvable."));
     }
     @Transactional
-    public match updateMatchScore(Long matchId, Long academieId, Long joueurId) {
+    public Match updateMatchScore(Long matchId, Long academieId, Long joueurId) {
         logger.info("Mise à jour du score pour le match ID: {}, académie ID: {}, joueur ID: {}", matchId, academieId, joueurId);
 
-        match match = matchRepository.findById(matchId)
+        Match match = matchRepository.findById(matchId)
                 .orElseThrow(() -> {
                     logger.error("Le match avec l'ID {} est introuvable.", matchId);
                     return new IllegalArgumentException("Le match avec l'ID " + matchId + " est introuvable.");
@@ -129,7 +128,7 @@ public List<Joueur> getJoueurAvecCartonJaune(long idMatch){
 
 
 
-    public Academie getAcademyById(match match, Long academieId) {
+    public Academie getAcademyById(Match match, Long academieId) {
         return match.getAcademies().stream()
                 .filter(academie -> academie.getId().equals(academieId))
                 .findFirst()
@@ -139,7 +138,7 @@ public List<Joueur> getJoueurAvecCartonJaune(long idMatch){
 
 
 
-    public List<match> getAllMatches() {
+    public List<Match> getAllMatches() {
         return matchRepository.findAll();
     }
 
@@ -152,11 +151,11 @@ public List<Joueur> getJoueurAvecCartonJaune(long idMatch){
         }
     }
     @Transactional
-    public match addCarton(Long matchId, Long academieId, Long joueurId, String couleurCarton) {
+    public Match addCarton(Long matchId, Long academieId, Long joueurId, String couleurCarton) {
         logger.info("Ajout d'un carton {} pour le joueur ID: {}, académie ID: {}, match ID: {}", couleurCarton, joueurId, academieId, matchId);
 
         // Vérification du match
-        match match = matchRepository.findById(matchId)
+        Match match = matchRepository.findById(matchId)
                 .orElseThrow(() -> {
                     logger.error("Le match avec l'ID {} est introuvable.", matchId);
                     return new IllegalArgumentException("Le match avec l'ID " + matchId + " est introuvable.");
