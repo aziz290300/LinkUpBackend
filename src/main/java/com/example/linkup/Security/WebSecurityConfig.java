@@ -63,9 +63,9 @@ public class WebSecurityConfig {
                         .requestMatchers("/auth/**").permitAll()
 
                         // Routes pour SUPERVISEUR
-                        .requestMatchers("academie/**").hasRole("SUPERVISEUR")
-                        .requestMatchers("/match/**").hasRole("SUPERVISEUR")
-                        .requestMatchers("joueur/**").hasRole("SUPERVISEUR")
+                        .requestMatchers("academie/**").hasAnyRole("SUPERVISEUR","ORGANISATEUR")
+                        .requestMatchers("/match/**").hasAnyRole("SUPERVISEUR","ORGANISATEUR")
+                        .requestMatchers("joueur/**").hasRole("ORGANISATEUR")
 
                         // Routes pour RESPONSABLE et ORGANISATEUR
                         .requestMatchers("tournoi/**").hasAnyRole("RESPONSABLE", "ORGANISATEUR")

@@ -36,6 +36,7 @@ public class Academie implements Serializable {
             }
     )
     public List<ImageData> logoacademie;
+
     @JsonIgnore
     @ManyToOne
     private User utilisateur;
