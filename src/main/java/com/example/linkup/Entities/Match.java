@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -36,7 +37,8 @@ public class Match implements Serializable {
     private List<Academie> academies;
 
     @ElementCollection
-    private List<String> butteur;
+
+    private List<String> butteur = new ArrayList<>();
     @ManyToOne
     private Tournoi tournoi;
 }
