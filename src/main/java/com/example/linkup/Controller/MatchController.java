@@ -38,17 +38,17 @@ public class MatchController {
         return matchService.getMatchById(id);
     }
 
-    @GetMapping("/all")
-    public List<Match> getAllMatches() {
-        return matchService.getAllMatches();
-    }
+
 
     @DeleteMapping("/delete/{id}")
     public void deleteMatch(@PathVariable Integer id) {
         matchService.deleteMatch(id);
     }
 
-
+    @GetMapping("/all")
+    public List<Match> getAllMatches() {
+        return matchService.getAllMatches();
+    }
     @PutMapping("/updateScore/{matchId}")
     public ResponseEntity<?> updateMatchScore(
             @PathVariable Long matchId,

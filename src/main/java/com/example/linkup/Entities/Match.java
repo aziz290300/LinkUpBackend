@@ -21,7 +21,7 @@ public class Match implements Serializable {
     private int nbrmitemps;
     private int duree_mitemps;
     private LocalDateTime datetime;
-    private String score;
+    private String score ;
     private String carton_rouge = ""; // Initialise avec une chaîne vide
     private String carton_jaune = ""; // Initialise avec une chaîne vide
 

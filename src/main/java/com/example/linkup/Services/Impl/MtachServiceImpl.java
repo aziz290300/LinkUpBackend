@@ -66,6 +66,18 @@ public class MtachServiceImpl  {
         return matchRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Match introuvable."));
     }
+    public List<Match> getAllMatches() {
+        return matchRepository.findAll();
+    }
+
+
+    public void deleteMatch(Integer id) {
+        if (matchRepository.existsById(id)) {
+            matchRepository.deleteById(id);
+        } else {
+            throw new IllegalArgumentException("Match introuvable.");
+        }
+    }
     @Transactional
     public Match updateMatchScore(Long matchId, Long academieId, Long joueurId) {
         logger.info("Mise à jour du score pour le match ID: {}, académie ID: {}, joueur ID: {}", matchId, academieId, joueurId);
@@ -90,14 +102,11 @@ public class MtachServiceImpl  {
             throw new IllegalArgumentException("Le joueur avec l'ID " + joueurId + " n'appartient pas à l'académie " + academieId + ".");
         }
 
-        // Vérifier si le joueur a un carton rouge
-        if (match.getCarton_rouge() != null) {
-            List<Long> joueursCartonRouge = Arrays.stream(match.getCarton_rouge().split(","))
-                    .map(Long::parseLong)
-                    .collect(Collectors.toList());
-            if (joueursCartonRouge.contains(joueurId)) {
-                throw new IllegalArgumentException("Le joueur avec l'ID " + joueurId + " a reçu un carton rouge et est exclu du match.");
-            }
+        // Vérification si le score est vide ou null, et assigner une valeur par défaut si nécessaire
+        String currentScore = match.getScore();
+        if (currentScore == null || currentScore.trim().isEmpty()) {
+            currentScore = "0-0";  // Valeur par défaut
+            logger.info("Le score était vide ou null, initialisation à '0-0'.");
         }
 
         // Incrémenter les buts du joueur
@@ -110,8 +119,9 @@ public class MtachServiceImpl  {
         }
         match.getButteur().add(joueur.getNom()); // Ajouter le joueur dans la liste des buteurs
 
-        // Mettre à jour le score
-        String[] scoreParts = parseScore(match.getScore());
+        // Mise à jour du score
+        String[] scoreParts = parseScore(currentScore);
+
         int scoreAcademie1 = Integer.parseInt(scoreParts[0]);
         int scoreAcademie2 = Integer.parseInt(scoreParts[1]);
 
@@ -126,22 +136,26 @@ public class MtachServiceImpl  {
 
         match.setScore(scoreAcademie1 + "-" + scoreAcademie2);
 
+        // Log du score après la mise à jour
+        logger.info("Score après mise à jour : {}", match.getScore());
+
         return matchRepository.save(match);
     }
 
-
-
     private String[] parseScore(String score) {
-        if (score == null || score.isEmpty()) {
-            throw new IllegalArgumentException("Le score ne peut pas être nul ou vide.");
+        if (score == null || score.isEmpty() || score.trim().equals("-")) {
+            return new String[]{"0", "0"};  // Score par défaut si le score est vide ou "-".
         }
-        // Supprimer les espaces autour du tiret
+
+        // Normaliser le format du score
         String normalizedScore = score.replace(" - ", "-").replace(" ", "");
         if (!normalizedScore.matches("\\d+-\\d+")) {
             throw new IllegalArgumentException("Format de score invalide : " + score);
         }
         return normalizedScore.split("-");
     }
+
+
 
     public List<String> getMatchButteurs(Long matchId) {
         Match match = matchRepository.findById(matchId)
@@ -161,18 +175,7 @@ public class MtachServiceImpl  {
 
 
 
-    public List<Match> getAllMatches() {
-        return matchRepository.findAll();
-    }
 
-
-    public void deleteMatch(Integer id) {
-        if (matchRepository.existsById(id)) {
-            matchRepository.deleteById(id);
-        } else {
-            throw new IllegalArgumentException("Match introuvable.");
-        }
-    }
     @Transactional
     public Match addCarton(Long matchId, Long academieId, Long joueurId, String couleurCarton) {
         logger.info("Ajout d'un carton {} pour le joueur ID: {}, académie ID: {}, match ID: {}", couleurCarton, joueurId, academieId, matchId);
