@@ -82,6 +82,7 @@ public class MtachServiceImpl  {
     public Match updateMatchScore(Long matchId, Long academieId, Long joueurId) {
         logger.info("Mise à jour du score pour le match ID: {}, académie ID: {}, joueur ID: {}", matchId, academieId, joueurId);
 
+        // Récupérer le match
         Match match = matchRepository.findById(matchId)
                 .orElseThrow(() -> {
                     logger.error("Le match avec l'ID {} est introuvable.", matchId);
@@ -90,16 +91,30 @@ public class MtachServiceImpl  {
 
         logger.info("Match trouvé : {}", match);
 
+        // Vérifier l'académie
         Academie academie = academieRepository.findById(academieId)
                 .orElseThrow(() -> new IllegalArgumentException("L'académie avec l'ID " + academieId + " est introuvable."));
         if (!match.getAcademies().contains(academie)) {
             throw new IllegalArgumentException("L'académie avec l'ID " + academieId + " n'est pas associée au match.");
         }
 
+        // Vérifier le joueur
         Joueur joueur = joueurRepository.findById(joueurId)
                 .orElseThrow(() -> new IllegalArgumentException("Le joueur avec l'ID " + joueurId + " est introuvable."));
         if (!joueur.getAcademie().equals(academie)) {
             throw new IllegalArgumentException("Le joueur avec l'ID " + joueurId + " n'appartient pas à l'académie " + academieId + ".");
+        }
+
+        // Vérifier si le joueur a un carton rouge
+        String cartonRouge = match.getCarton_rouge();
+        List<Long> joueursAvecCartonRouge = (cartonRouge == null || cartonRouge.isEmpty())
+                ? Collections.emptyList()
+                : Arrays.stream(cartonRouge.split(","))
+                .map(Long::parseLong)
+                .collect(Collectors.toList());
+
+        if (joueursAvecCartonRouge.contains(joueurId)) {
+            throw new IllegalArgumentException("ce joueur a un carton rouge il est exclu du match .");
         }
 
         // Vérification si le score est vide ou null, et assigner une valeur par défaut si nécessaire
